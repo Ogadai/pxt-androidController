@@ -1,15 +1,13 @@
 {
     "name": "pxt-androidcontroller",
     "version": "0.0.0",
-    "description": "",
+    "description": "micro:bit extension for receiving input from an Android controller app",
     "dependencies": {
         "core": "*",
-        "radio": "*",
         "microphone": "*"
     },
     "files": [
         "README.md",
-        "main.blocks",
         "main.ts"
     ],
     "testFiles": [
@@ -19,5 +17,5 @@
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "blocksprj"
+    "preferredEditor": "tsprj"
 }
