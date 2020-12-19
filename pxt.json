@@ -8,7 +8,8 @@
     },
     "files": [
         "README.md",
-        "main.ts"
+        "controller.ts",
+        "motors.ts"
     ],
     "testFiles": [
         "test.ts"
