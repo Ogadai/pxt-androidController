@@ -1,4 +1,5 @@
 //% color="#EDC857" weight=100 icon="\uf11b" block="Controller"
+//% groups=['Tilt']
 namespace controller {
     export type ControllerHandler = () => void;
 
@@ -50,11 +51,13 @@ namespace controller {
         }
 
         //% blockId=controller_tilt_on_change block="on %button change"
+        //% group="Tilt"
         onChange(handler: () => void) {
             this.handlers.push(handler);
         }
 
         //% blockId=controller_title_angle block="%tilt angle"
+        //% group="Tilt"
         get angle(): number {
             return this.tiltAngle;
         } 
