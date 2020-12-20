@@ -6,7 +6,6 @@
         "core": "*"
     },
     "files": [
-        "README.md",
         "controller.ts",
         "motors.ts"
     ],
