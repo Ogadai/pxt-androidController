@@ -4,17 +4,11 @@ namespace controller {
     //% fixedInstances
     export class Button {
         private isOn: boolean;
-        private changeHandler: () => void;
-        private pressedHandler: () => void;
-
-        //% blockId=controller_button_on_change block="on %button change"
-        onChange(handler: () => void) {
-            this.changeHandler = handler;
-        }
+        private handler: () => void;
 
         //% blockId=controller_button_on_pressed block="on %button pressed"
         onPressed(handler: () => void) {
-            this.pressedHandler = handler;
+            this.handler = handler;
         }
 
         //% blockId=controller_button_pressed block="%button pressed"
@@ -30,10 +24,8 @@ namespace controller {
         setPressed(on: boolean): boolean {
             if (this.isOn !== on) {
                 this.isOn = on;
-                if (this.changeHandler) this.changeHandler();
-
-                if (this.isOn && this.pressedHandler) {
-                    this.pressedHandler();
+                if (this.isOn && this.handler) {
+                    this.handler();
                 }
                 return true;
             }
@@ -43,16 +35,16 @@ namespace controller {
 
     //% fixedInstances
     export class Pair {
-        private changeHandler: () => void;
+        private handler: () => void;
 
         //% blockId=controller_pair_on_change block="pair %button change"
         onChange(handler: () => void) {
-            this.changeHandler = handler;
+            this.handler = handler;
         }
 
         changed() {
-            if (this.changeHandler) {
-                this.changeHandler();
+            if (this.handler) {
+                this.handler();
             }
         }
     }
@@ -112,14 +104,16 @@ namespace controller {
     export const xboxXY = new Pair();
 
     control.onEvent(1026, EventBusValue.MICROBIT_EVT_ANY, function () {
-        dPadRight.setPressed(control.eventValue() == 2);
-        dPadLeft.setPressed(control.eventValue() == 1);
+        const ev = control.eventValue();
+        dPadRight.setPressed(ev == 2);
+        dPadLeft.setPressed(ev == 1);
         dPadLeftRight.changed();
     });
 
     control.onEvent(1027, EventBusValue.MICROBIT_EVT_ANY, function () {
-        dPadUp.setPressed(control.eventValue() == 2);
-        dPadDown.setPressed(control.eventValue() == 1);
+        const ev = control.eventValue();
+        dPadUp.setPressed(ev == 2);
+        dPadDown.setPressed(ev == 1);
         dPadUpDown.changed();
     });
 
