@@ -2,8 +2,8 @@
 //% groups=['Tilt']
 namespace controller {
     //% fixedInstances
-    export class ControllerButton {
-        private isPressed: boolean;
+    export class Button {
+        private isOn: boolean;
         private changeHandler: () => void;
         private pressedHandler: () => void;
 
@@ -19,20 +19,20 @@ namespace controller {
 
         //% blockId=controller_button_pressed block="%button pressed"
         get pressed(): boolean {
-            return this.isPressed;
+            return this.isOn;
         }
 
         //% blockId=controller_button_value block="%button value"
         get value(): number {
-            return this.isPressed ? 1 : 0;
+            return this.isOn ? 1 : 0;
         }
 
-        setPressed(pressed: boolean): boolean {
-            if (this.isPressed !== pressed) {
-                this.isPressed = pressed;
+        setPressed(on: boolean): boolean {
+            if (this.isOn !== on) {
+                this.isOn = on;
                 if (this.changeHandler) this.changeHandler();
 
-                if (this.isPressed && this.pressedHandler) {
+                if (this.isOn && this.pressedHandler) {
                     this.pressedHandler();
                 }
                 return true;
@@ -42,7 +42,7 @@ namespace controller {
     }
 
     //% fixedInstances
-    export class ControllerPair {
+    export class Pair {
         private changeHandler: () => void;
 
         //% blockId=controller_pair_on_change block="pair %button change"
@@ -58,7 +58,7 @@ namespace controller {
     }
 
     //% fixedInstances
-    export class ControllerTilt {
+    export class Tilt {
         private tiltAngle: number;
         private handler: () => void;
 
@@ -81,35 +81,35 @@ namespace controller {
     }    
 
     //% fixedInstance block="dPadUp" blockId=controller_dpadup
-    export const dPadUp = new ControllerButton();
+    export const dPadUp = new Button();
     //% fixedInstance block="dPadDown" blockId=controller_dpaddown
-    export const dPadDown = new ControllerButton();
+    export const dPadDown = new Button();
     //% fixedInstance block="dPadLeft" blockId=controller_dpadleft
-    export const dPadLeft = new ControllerButton();
+    export const dPadLeft = new Button();
     //% fixedInstance block="dPadRight" blockId=controller_dpadright
-    export const dPadRight = new ControllerButton();
+    export const dPadRight = new Button();
 
     //% fixedInstance block="dPadUpDown" blockId=controller_dpadupdown
-    export const dPadUpDown = new ControllerPair();
+    export const dPadUpDown = new Pair();
     //% fixedInstance block="dPadLeftRight" blockId=controller_dpadleftright
-    export const dPadLeftRight = new ControllerPair();
+    export const dPadLeftRight = new Pair();
 
     //% fixedInstance block="steering"
-    export const steering = new ControllerTilt();
+    export const steering = new Tilt();
 
     //% fixedInstance block="xBoxA" blockId=controller_xboxa
-    export const xBoxA = new ControllerButton();
+    export const xBoxA = new Button();
     //% fixedInstance block="xBoxB" blockId=controller_xboxb
-    export const xBoxB = new ControllerButton();
+    export const xBoxB = new Button();
     //% fixedInstance block="xBoxX" blockId=controller_xboxx
-    export const xBoxX = new ControllerButton();
+    export const xBoxX = new Button();
     //% fixedInstance block="xBoxY" blockId=controller_xboxy
-    export const xBoxY = new ControllerButton();
+    export const xBoxY = new Button();
 
     //% fixedInstance block="xboxAB" blockId=controller_xboxab
-    export const xboxAB = new ControllerPair();
+    export const xboxAB = new Pair();
     //% fixedInstance block="xboxXY" blockId=controller_xboxxy
-    export const xboxXY = new ControllerPair();
+    export const xboxXY = new Pair();
 
     control.onEvent(1026, EventBusValue.MICROBIT_EVT_ANY, function () {
         dPadRight.setPressed(control.eventValue() == 2);
