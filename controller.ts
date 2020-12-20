@@ -1,27 +1,20 @@
 //% color="#EDC857" weight=100 icon="\uf11b" block="Controller"
 //% groups=['Tilt']
 namespace controller {
-    export type ControllerHandler = () => void;
-
     //% fixedInstances
     export class ControllerButton {
         private isPressed: boolean;
-        private changeHandlers: ControllerHandler[];
-        private pressedHandlers: ControllerHandler[];
-
-        constructor() {
-            this.changeHandlers = [];
-            this.pressedHandlers = [];
-        }
+        private changeHandler: () => void;
+        private pressedHandler: () => void;
 
         //% blockId=controller_button_on_change block="on %button change"
         onChange(handler: () => void) {
-            this.changeHandlers.push(handler);
+            this.changeHandler = handler;
         }
 
         //% blockId=controller_button_on_pressed block="on %button pressed"
         onPressed(handler: () => void) {
-            this.pressedHandlers.push(handler);
+            this.pressedHandler = handler;
         }
 
         //% blockId=controller_button_pressed block="%button pressed"
@@ -29,13 +22,18 @@ namespace controller {
             return this.isPressed;
         }
 
+        //% blockId=controller_button_value block="%button value"
+        get value(): number {
+            return this.isPressed ? 1 : 0;
+        }
+
         setPressed(pressed: boolean): void {
             if (this.isPressed !== pressed) {
                 this.isPressed = pressed;
-                this.changeHandlers.forEach(h => h());
+                if (this.changeHandler) this.changeHandler();
 
-                if (this.isPressed) {
-                    this.pressedHandlers.forEach(h => h());
+                if (this.isPressed && this.pressedHandler) {
+                    this.pressedHandler();
                 }
             }
         }
@@ -44,16 +42,12 @@ namespace controller {
     //% fixedInstances
     export class ControllerTilt {
         private tiltAngle: number;
-        private handlers: ControllerHandler[];
-
-        constructor() {
-            this.handlers = [];
-        }
+        private handler: () => void;
 
         //% blockId=controller_tilt_on_change block="on %button change"
         //% group="Tilt"
         onChange(handler: () => void) {
-            this.handlers.push(handler);
+            this.handler = handler;
         }
 
         //% blockId=controller_title_angle block="%tilt angle"
@@ -64,7 +58,7 @@ namespace controller {
 
         setAngle(angle: number): void {
             this.tiltAngle = angle;
-            this.handlers.forEach(h => h());
+            if (this.handler) this.handler();
         }
     }    
 

@@ -6,7 +6,7 @@ namespace controller {
         private forwardsOn: boolean;
         private backwardsOn: boolean;
 
-        constructor(private p1: number, private p2: number) {
+        constructor(private p1: DigitalPin, private p2: DigitalPin) {
         }
 
         //% blockId=micromotor_setforwards block="%motor forwards %on"
@@ -30,7 +30,7 @@ namespace controller {
     }
 
     //% fixedInstance block="M1" blockId=micromotor_m1
-    export const M1 = new MicroMotor(12, 13);
+    export const M1 = new MicroMotor(DigitalPin.P12, DigitalPin.P13);
     //% fixedInstance block="M2" blockId=micromotor_m2
-    export const M2 = new MicroMotor(14, 15);
+    export const M2 = new MicroMotor(DigitalPin.P14, DigitalPin.P15);
 }
