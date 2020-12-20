@@ -6,8 +6,7 @@
         "core": "*"
     },
     "files": [
-        "controller.ts",
-        "motors.ts"
+        "controller.ts"
     ],
     "testFiles": [
         "test.ts"
