@@ -27,7 +27,7 @@ namespace controller {
             return this.isPressed ? 1 : 0;
         }
 
-        setPressed(pressed: boolean): void {
+        setPressed(pressed: boolean): boolean {
             if (this.isPressed !== pressed) {
                 this.isPressed = pressed;
                 if (this.changeHandler) this.changeHandler();
@@ -35,6 +35,24 @@ namespace controller {
                 if (this.isPressed && this.pressedHandler) {
                     this.pressedHandler();
                 }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    //% fixedInstances
+    export class ControllerPair {
+        private changeHandler: () => void;
+
+        //% blockId=controller_pair_on_change block="pair %button change"
+        onChange(handler: () => void) {
+            this.changeHandler = handler;
+        }
+
+        changed() {
+            if (this.changeHandler) {
+                this.changeHandler();
             }
         }
     }
@@ -71,6 +89,11 @@ namespace controller {
     //% fixedInstance block="dPadRight" blockId=controller_dpadright
     export const dPadRight = new ControllerButton();
 
+    //% fixedInstance block="dPadUpDown" blockId=controller_dpadupdown
+    export const dPadUpDown = new ControllerPair();
+    //% fixedInstance block="dPadLeftRight" blockId=controller_dpadleftright
+    export const dPadLeftRight = new ControllerPair();
+
     //% fixedInstance block="steering"
     export const steering = new ControllerTilt();
 
@@ -83,15 +106,21 @@ namespace controller {
     //% fixedInstance block="xBoxY" blockId=controller_xboxy
     export const xBoxY = new ControllerButton();
 
+    //% fixedInstance block="xboxAB" blockId=controller_xboxab
+    export const xboxAB = new ControllerPair();
+    //% fixedInstance block="xboxXY" blockId=controller_xboxxy
+    export const xboxXY = new ControllerPair();
 
     control.onEvent(1026, EventBusValue.MICROBIT_EVT_ANY, function () {
         dPadRight.setPressed(control.eventValue() == 2);
         dPadLeft.setPressed(control.eventValue() == 1);
+        dPadLeftRight.changed();
     });
 
     control.onEvent(1027, EventBusValue.MICROBIT_EVT_ANY, function () {
         dPadUp.setPressed(control.eventValue() == 2);
         dPadDown.setPressed(control.eventValue() == 1);
+        dPadUpDown.changed();
     });
 
     control.onEvent(1028, EventBusValue.MICROBIT_EVT_ANY, function () {
@@ -104,9 +133,11 @@ namespace controller {
 
     control.onEvent(1029, EventBusValue.MICROBIT_EVT_ANY, function () {
         const value = control.eventValue();
-        xBoxX.setPressed(isSet(value, 1));
-        xBoxY.setPressed(isSet(value, 2));
-        xBoxA.setPressed(isSet(value, 4));
-        xBoxB.setPressed(isSet(value, 8));
+        if (xBoxX.setPressed(isSet(value, 1)) || xBoxY.setPressed(isSet(value, 2))) {
+            xboxXY.changed();
+        }
+        if (xBoxA.setPressed(isSet(value, 4)) || xBoxB.setPressed(isSet(value, 8))) {
+            xboxAB.changed();
+        }
     });
 }

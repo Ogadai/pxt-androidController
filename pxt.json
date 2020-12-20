@@ -3,8 +3,7 @@
     "version": "0.0.0",
     "description": "micro:bit extension for receiving input from an Android controller app",
     "dependencies": {
-        "core": "*",
-        "microphone": "*"
+        "core": "*"
     },
     "files": [
         "README.md",
