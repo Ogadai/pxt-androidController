@@ -1,137 +1,111 @@
-//% color="#EDC857" weight=100 icon="\uf11b" block="Controller"
-//% groups=['Tilt']
-namespace controller {
-    //% fixedInstances
-    export class Button {
-        private isOn: boolean;
-        private handler: () => void;
+enum acBtn {
+    //% block="DPad Up"
+    DUp,
+    //% block="DPad Down"
+    DDown,
+    //% block="DPad Left"
+    DLeft,
+    //% block="DPad Right"
+    DRight,
+    //% block="DPad Up or Down"
+    DUpDown,
+    //% block="DPad Left or Right"
+    DLeftRight,
+    //% block="DPad Any"
+    DPad,
+    //% block="XBox Y"
+    XY,
+    //% block="XBox X"
+    XX,
+    //% block="XBox A"
+    XA,
+    //% block="XBox B"
+    XB,
+    //% block="XBox X or Y"
+    XXY,
+    //% block="XBox A or B"
+    XAB,
+    //% block="ABox Any"
+    XBox,
+    //% block="Steering"
+    Steer
+}
 
-        //% blockId=controller_button_on_pressed block="on %button pressed"
-        onPressed(handler: () => void) {
-            this.handler = handler;
-        }
+//% color="#EDC857" weight=50 icon="\uf11b"
+namespace Controller {
+    const _state: any = {};
+    const _onPress: any = {};
+    const _onChange: any = {};
 
-        //% blockId=controller_button_pressed block="%button pressed"
-        get pressed(): boolean {
-            return this.isOn;
-        }
+    //% blockId=acOnPressed block="on %button pressed"
+    export function onPressed(btn: acBtn, handler: () => void): void {
+        _onPress[btn] = handler;
+    }
 
-        //% blockId=controller_button_value block="%button value"
-        get value(): number {
-            return this.isOn ? 1 : 0;
-        }
+    //% blockId=acOnChange block="on %button change"
+    export function onChange(btn: acBtn, handler: () => void): void {
+        _onChange[btn] = handler;
+    }
 
-        setPressed(on: boolean): boolean {
-            if (this.isOn !== on) {
-                this.isOn = on;
-                if (this.isOn && this.handler) {
-                    this.handler();
-                }
-                return true;
-            }
-            return false;
+    //% blockId=acPressed block="%button pressed"
+    export function pressed(btn: acBtn): boolean {
+        return _state[btn] !== 1;
+    }
+
+    //% blockId=acValue block="%button value"
+    export function value(btn: acBtn): number {
+        return _state[btn];
+    }
+
+    function doBtn(btn: acBtn, pressed: boolean): void {
+        if (doValue(btn, pressed ? 1 : 0)) {
+            if (pressed && _onPress[btn]) _onPress[btn]();
         }
     }
 
-    //% fixedInstances
-    export class Pair {
-        private handler: () => void;
-
-        //% blockId=controller_pair_on_change block="pair %button change"
-        onChange(handler: () => void) {
-            this.handler = handler;
+    function doValue(btn: acBtn, value: number): boolean {
+        if (_state[btn] !== value) {
+            _state[btn] = value;
+            if (_onChange[btn]) _onChange[btn]();
+            return true;
         }
-
-        changed() {
-            if (this.handler) {
-                this.handler();
-            }
-        }
+        return false;
     }
-
-    //% fixedInstances
-    export class Tilt {
-        private tiltAngle: number;
-        private handler: () => void;
-
-        //% blockId=controller_tilt_on_change block="on %button change"
-        //% group="Tilt"
-        onChange(handler: () => void) {
-            this.handler = handler;
-        }
-
-        //% blockId=controller_title_angle block="%tilt angle"
-        //% group="Tilt"
-        get angle(): number {
-            return this.tiltAngle;
-        } 
-
-        setAngle(angle: number): void {
-            this.tiltAngle = angle;
-            if (this.handler) this.handler();
-        }
-    }    
-
-    //% fixedInstance block="dPadUp" blockId=controller_dpadup
-    export const dPadUp = new Button();
-    //% fixedInstance block="dPadDown" blockId=controller_dpaddown
-    export const dPadDown = new Button();
-    //% fixedInstance block="dPadLeft" blockId=controller_dpadleft
-    export const dPadLeft = new Button();
-    //% fixedInstance block="dPadRight" blockId=controller_dpadright
-    export const dPadRight = new Button();
-
-    //% fixedInstance block="dPadUpDown" blockId=controller_dpadupdown
-    export const dPadUpDown = new Pair();
-    //% fixedInstance block="dPadLeftRight" blockId=controller_dpadleftright
-    export const dPadLeftRight = new Pair();
-
-    //% fixedInstance block="steering"
-    export const steering = new Tilt();
-
-    //% fixedInstance block="xBoxA" blockId=controller_xboxa
-    export const xBoxA = new Button();
-    //% fixedInstance block="xBoxB" blockId=controller_xboxb
-    export const xBoxB = new Button();
-    //% fixedInstance block="xBoxX" blockId=controller_xboxx
-    export const xBoxX = new Button();
-    //% fixedInstance block="xBoxY" blockId=controller_xboxy
-    export const xBoxY = new Button();
-
-    //% fixedInstance block="xboxAB" blockId=controller_xboxab
-    export const xboxAB = new Pair();
-    //% fixedInstance block="xboxXY" blockId=controller_xboxxy
-    export const xboxXY = new Pair();
 
     control.onEvent(1026, EventBusValue.MICROBIT_EVT_ANY, function () {
         const ev = control.eventValue();
-        dPadRight.setPressed(ev == 2);
-        dPadLeft.setPressed(ev == 1);
-        dPadLeftRight.changed();
+        doBtn(acBtn.DRight, ev === 2);
+        doBtn(acBtn.DLeft, ev === 1);
+        doBtn(acBtn.DLeftRight, ev !== 0);
+        doBtn(acBtn.DPad, ev !== 0 || _state[acBtn.DUpDown] );
     });
 
     control.onEvent(1027, EventBusValue.MICROBIT_EVT_ANY, function () {
         const ev = control.eventValue();
-        dPadUp.setPressed(ev == 2);
-        dPadDown.setPressed(ev == 1);
-        dPadUpDown.changed();
+        doBtn(acBtn.DUp, ev === 2);
+        doBtn(acBtn.DDown, ev === 1);
+        doBtn(acBtn.DUpDown, ev !== 0);
+        doBtn(acBtn.DPad, ev !== 0 || _state[acBtn.DLeftRight] );
     });
 
     control.onEvent(1028, EventBusValue.MICROBIT_EVT_ANY, function () {
-        steering.setAngle((control.eventValue() - 100) * 0.9);
+        doValue(acBtn.Steer, (control.eventValue() - 100) * 0.9);
     });
 
-    function isSet (inputValue: number, checkValue: number) {
-        return Math.floor(inputValue / checkValue / 2) * 2 != Math.floor(inputValue / checkValue)
+    function isSet (value: number, checkValue: number): boolean {
+        return Math.floor(value / checkValue / 2) * 2 != Math.floor(value / checkValue)
     }
 
     control.onEvent(1029, EventBusValue.MICROBIT_EVT_ANY, function () {
         const value = control.eventValue();
-        if (xBoxX.setPressed(isSet(value, 1)) || xBoxY.setPressed(isSet(value, 2))) {
-            xboxXY.changed();
-        }
-        if (xBoxA.setPressed(isSet(value, 4)) || xBoxB.setPressed(isSet(value, 8))) {
-            xboxAB.changed();
-        }
+
+        doBtn(acBtn.XX, isSet(value, 1));
+        doBtn(acBtn.XY, isSet(value, 2));
+        doBtn(acBtn.XA, isSet(value, 4));
+        doBtn(acBtn.XB, isSet(value, 8));
+
+        doBtn(acBtn.XXY, _state[acBtn.XX] || _state[acBtn.XY]);
+        doBtn(acBtn.XAB, _state[acBtn.XA] || _state[acBtn.XB]);
+        doBtn(acBtn.XBox, value !== 0);
     });
 }
